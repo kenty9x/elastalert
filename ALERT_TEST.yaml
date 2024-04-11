@@ -1,0 +1,46 @@
+name: ALERT_TEST:production-app
+type: frequency
+index: filebeat-*
+is_enabled: False
+num_events: 1
+timeframe:
+  minutes: 20
+realert:
+  minutes: 15
+filter:
+  - query:
+      query_string:
+        query: "kubernetes.namespace : testing_ns AND message: \"testingquery\" "
+include:
+  - kubernetes.namespace
+  - kubernetes.statefulset.name
+  - kubernetes.pod.name
+  - message
+email_format: html
+alert:
+  - email
+email:
+  - "abc@abc.com"
+alert_subject: "ElastAlert: Testing Application Alert [PROD]"
+alert_text_type: alert_text_only
+alert_text: |
+  <html>
+  <body>
+     <p style="text-align:left;">Hi Team,</p>
+     <p style="text-align:left;">Please check the below errors in Kibana:
+     <br>
+     <br><b>Log Identifier:</b> TESTING_ALERT
+     <br><b>Kube Cluster:</b> {0}
+     <br><b>kubernetes.statefulset.name:</b> {1}
+     <br><b>kubernetes.pod.name:</b> {2}
+     <br><b>Message:</b> {3}
+     <br>
+     <p style="text-align:left;">Regards,
+     <br>Automatic Alert from Elastalert</p><br/>
+  </body>
+  </html>
+alert_text_args:
+  - kubernetes.namespace
+  - kubernetes.statefulset.name
+  - kubernetes.pod.name
+  - message
